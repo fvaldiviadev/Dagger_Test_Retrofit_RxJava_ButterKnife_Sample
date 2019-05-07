@@ -5,19 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".view.login.MainActivity">
+    tools:context=".login.View.LoginActivity">
 
     <EditText
         android:id="@+id/et_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/user"
+        android:hint="@string/first_name"
         />
     <EditText
-        android:id="@+id/et_pwd"
+        android:id="@+id/et_last_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/pwd"
+        android:hint="@string/last_name"
         />
 
     <Button

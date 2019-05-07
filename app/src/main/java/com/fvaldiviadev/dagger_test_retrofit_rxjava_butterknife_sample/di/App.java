@@ -9,7 +9,10 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        component=DaggerApplicationComponent.builder().applicationModule(new ApplicationModule(this)).build();
+        component=DaggerApplicationComponent.builder()
+                .applicationModule(new ApplicationModule(this))
+                .loginModule(new LoginModule())
+                .build();
     }
 
     public ApplicationComponent getComponent(){
