@@ -24,6 +24,17 @@
         android:id="@+id/b_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/login"/>
+        android:text="@string/save_user"/>
+
+    <Button
+        android:id="@+id/b_get_top_games"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Show Twitch top games"/>
+
+    <TextView
+        android:id="@+id/tv_get_top_games"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

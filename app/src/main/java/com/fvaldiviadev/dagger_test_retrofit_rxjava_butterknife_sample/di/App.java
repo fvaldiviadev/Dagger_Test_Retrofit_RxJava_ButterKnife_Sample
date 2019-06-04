@@ -12,6 +12,7 @@ public class App extends Application {
         component=DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .loginModule(new LoginModule())
+                .twitchModule(new TwitchModule())
                 .build();
     }
 

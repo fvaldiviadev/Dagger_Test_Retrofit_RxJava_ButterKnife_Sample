@@ -2,5 +2,5 @@
     <string name="app_name">Dagger_Test_Retrofit_RxJava_ButterKnife_Sample</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
-    <string name="login">Login</string>
+    <string name="save_user">Save user</string>
 </resources>
