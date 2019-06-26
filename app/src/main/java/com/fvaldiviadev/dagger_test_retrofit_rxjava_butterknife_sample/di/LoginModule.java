@@ -5,6 +5,7 @@ import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.Log
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.LoginRepositoryImpl;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.Model.LoginModel;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.Presenter.LoginPresenter;
+import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.StreamMostViewed;
 
 import dagger.Module;
 import dagger.Provides;
@@ -25,5 +26,10 @@ public class LoginModule {
     @Provides
     public LoginRepository proviceLoginRepository(){
         return new LoginRepositoryImpl();
+    }
+
+    @Provides
+    public StreamMostViewed provideStreamMostViewed(){
+        return new StreamMostViewed();
     }
 }

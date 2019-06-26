@@ -4,17 +4,18 @@ import android.support.annotation.Nullable;
 
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.TwitchAPI;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.Game;
-import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.Twitch;
+import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.Stream;
+import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.TwitchGames;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.LoginContract;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.User;
 
-import java.util.List;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
-import javax.inject.Inject;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LoginPresenter implements LoginContract.Presenter {
 
@@ -28,17 +29,16 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     @Override
     public void setView(LoginContract.View view) {
-        this.view=view;
-
+        this.view = view;
     }
 
     @Override
     public void loginButtonClicked() {
-        if(view!=null){
-            if(view.getFirstName().trim().equals("") || view.getLastName().trim().equals("")){
+        if (view != null) {
+            if (view.getFirstName().trim().equals("") || view.getLastName().trim().equals("")) {
                 view.showInputError();
-            }else{
-                model.createUser(view.getFirstName().trim(),view.getLastName().trim());
+            } else {
+                model.createUser(view.getFirstName().trim(), view.getLastName().trim());
                 view.showUserSaved();
             }
         }
@@ -46,13 +46,13 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     @Override
     public void getCurrentUser() {
-        User user=model.getUser();
-        if(user==null){
-            if(view!=null){
+        User user = model.getUser();
+        if (user == null) {
+            if (view != null) {
                 view.showUserNotAvailable();
             }
-        }else{
-            if(view!=null){
+        } else {
+            if (view != null) {
                 view.setFirstName(user.getFirstName());
                 view.setLastName(user.getLastName());
             }
@@ -61,18 +61,71 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     @Override
     public void getTopGames(TwitchAPI twitchAPI) {
-        Call<Twitch> call=twitchAPI.getTopGames(TwitchAPI.CLIENT_ID);
-        call.enqueue(new Callback<Twitch>() {
-            @Override
-            public void onResponse(Call<Twitch> call, Response<Twitch> response) {
-                List<Game> topGames=response.body().getGame();
-                view.showTopGames(topGames);
-            }
+//        Call<TwitchGames> call=twitchAPI.getTopGames(TwitchAPI.CLIENT_ID);
+//        call.enqueue(new Callback<TwitchGames>() {
+//            @Override
+//            public void onResponse(Call<TwitchGames> call, Response<TwitchGames> response) {
+//                List<Game> topGames=response.body().getGameList();
+//                view.showTopGames(topGames);
+//            }
+//
+//            @Override
+//            public void onFailure(Call<TwitchGames> call, Throwable t) {
+//                t.printStackTrace();
+//            }
+//        });
 
-            @Override
-            public void onFailure(Call<Twitch> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
+        twitchAPI.getTopGamesObservable(TwitchAPI.CLIENT_ID)
+                .flatMap(twitchGames -> Observable.fromIterable(twitchGames.getGameList()))
+                .flatMap((Function<Game, Observable<String>>)
+                        game -> Observable.just(game.getName()))
+                .subscribeOn(Schedulers.io()) //With lambda
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(String gameName) {
+                        view.showGameName(gameName);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+    }
+
+    @Override
+    public void getStreams(TwitchAPI twitchAPI) {
+        Observable streams = twitchAPI.getStreamsObservable(TwitchAPI.CLIENT_ID)
+                .flatMap(twitchStreams -> Observable.fromIterable(twitchStreams.getStreamList()))
+                .filter(Stream -> Stream.getViewerCount() > 10000)
+                .replay()
+                .autoConnect(2)
+                .doOnError(throwable ->
+                        view.showError("Connection error getting streams"));
+
+        streams.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(stream -> {
+                    view.showStreamTitle(((Stream) stream).getTitle());
+                });
+
+        streams.flatMap(stream -> twitchAPI.getGame(((Stream) stream).getGameId(), TwitchAPI.CLIENT_ID))
+                .doOnError(throwable ->
+                        view.showError("Connection error getting game"))
+                .flatMap(twitchGames -> Observable.fromIterable(((TwitchGames) twitchGames).getGameList()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(game -> view.showGameName(((Game) game).getName()));
+
+
     }
 }

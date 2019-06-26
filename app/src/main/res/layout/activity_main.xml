@@ -31,6 +31,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Show Twitch top games"/>
+    <Button
+        android:id="@+id/b_get_most_viewed_streams"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Show the most watched Twitch Streams and their  game"/>
 
     <TextView
         android:id="@+id/tv_get_top_games"

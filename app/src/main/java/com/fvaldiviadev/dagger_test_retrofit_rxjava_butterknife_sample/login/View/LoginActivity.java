@@ -3,7 +3,6 @@ package com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.Vi
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,21 +13,17 @@ import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.R;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.di.App;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.TwitchAPI;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.Game;
-import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.Twitch;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.LoginContract;
+import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.StreamMostViewed;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class LoginActivity extends AppCompatActivity implements LoginContract.View {
 
-    EditText editTextFirstName,editTextLastName;
-    Button buttonLogin, buttonGetTopGames;
+    EditText editTextFirstName, editTextLastName;
+    Button buttonLogin, buttonGetTopGames, buttonMostViewedStreams;
     TextView textViewGetTopGames;
 
     @Inject
@@ -47,11 +42,12 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
         ((App) getApplication()).getComponent().inject(this);
 
-        editTextFirstName=findViewById(R.id.et_user);
-        editTextLastName=findViewById(R.id.et_last_name);
-        buttonLogin=findViewById(R.id.b_login);
-        buttonGetTopGames=findViewById(R.id.b_get_top_games);
-        textViewGetTopGames=findViewById(R.id.tv_get_top_games);
+        editTextFirstName = findViewById(R.id.et_user);
+        editTextLastName = findViewById(R.id.et_last_name);
+        buttonLogin = findViewById(R.id.b_login);
+        buttonGetTopGames = findViewById(R.id.b_get_top_games);
+        buttonMostViewedStreams = findViewById(R.id.b_get_most_viewed_streams);
+        textViewGetTopGames = findViewById(R.id.tv_get_top_games);
 
         //Without Lambda
         buttonLogin.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +58,16 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         });
 
         //With Lambda
-        buttonGetTopGames.setOnClickListener(v -> presenter.getTopGames(twitchAPI));
+        buttonGetTopGames.setOnClickListener(v -> {
+            textViewGetTopGames.setText("");
+            presenter.getTopGames(twitchAPI);
+        });
+
+        buttonMostViewedStreams.setOnClickListener(v -> {
+            textViewGetTopGames.setText("");
+            presenter.getStreams(twitchAPI);
+
+        });
 
     }
 
@@ -85,17 +90,17 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
     @Override
     public void showUserNotAvailable() {
-        Toast.makeText(context,"Error, user not available",Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Error, user not available", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showInputError() {
-        Toast.makeText(context,"Error, input error",Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Error, input error", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showUserSaved() {
-        Toast.makeText(context,"User saved!",Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "User saved!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -110,11 +115,33 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
     @Override
     public void showTopGames(List<Game> topGames) {
-        String topGamesString="";
-        for (Game game:topGames
-             ) {
-            topGamesString=topGamesString+"\n"+game.getName();
+        String topGamesString = "";
+        for (Game game : topGames
+        ) {
+            topGamesString = topGamesString + "\n" + game.getName();
         }
         textViewGetTopGames.setText(topGamesString);
     }
+
+    @Override
+    public void showStreamTitle(String streamTitle) {
+        textViewGetTopGames.setText(textViewGetTopGames.getText() + "\nStream: " + streamTitle);
+    }
+
+    @Override
+    public void showGameName(String gameName) {
+        textViewGetTopGames.setText(textViewGetTopGames.getText() + "\nGame:" + gameName);
+    }
+
+    @Override
+    public void showStream(StreamMostViewed streamMostViewed) {
+        textViewGetTopGames.setText(textViewGetTopGames.getText() + "\n\n" + streamMostViewed.getStreamName() + " - " + streamMostViewed.getGameName());
+    }
+
+    @Override
+    public void showError(String error) {
+        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+    }
+
+
 }

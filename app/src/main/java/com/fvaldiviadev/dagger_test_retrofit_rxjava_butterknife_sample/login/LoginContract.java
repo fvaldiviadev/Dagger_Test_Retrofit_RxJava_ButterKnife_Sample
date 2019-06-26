@@ -24,6 +24,10 @@ public interface LoginContract {
         void setLastName(String lastName);
 
         void showTopGames(List<Game> topGames);
+        void showStreamTitle(String streamTitle);
+        void showGameName(String gameName);
+        void showStream(StreamMostViewed streamMostViewed);
+        void showError(String error);
     }
 
     interface Presenter{
@@ -31,5 +35,6 @@ public interface LoginContract {
         void loginButtonClicked();
         void getCurrentUser();
         void getTopGames(TwitchAPI twitchAPI);
+        void getStreams(TwitchAPI twitchAPI);
     }
 }
