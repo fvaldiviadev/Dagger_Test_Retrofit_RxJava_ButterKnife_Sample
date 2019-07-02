@@ -3,4 +3,4 @@ Android app example using MVP Architecture, Dagger2, JUnit and Mockito test, RxJ
 
 You can find a tag for each technology, and compare the evolution of the code between versions.
 
-![Screenshot](screenshot.png)
+![Screenshot](screenshot2.png)
