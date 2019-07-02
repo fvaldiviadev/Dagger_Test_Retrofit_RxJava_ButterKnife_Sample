@@ -1,7 +1,6 @@
 package com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.Presenter;
 
-import android.support.annotation.Nullable;
-
+import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.R;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.TwitchAPI;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.Game;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.Stream;
@@ -9,6 +8,7 @@ import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.LoginContract;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.User;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -61,19 +61,6 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     @Override
     public void getTopGames(TwitchAPI twitchAPI) {
-//        Call<TwitchGames> call=twitchAPI.getTopGames(TwitchAPI.CLIENT_ID);
-//        call.enqueue(new Callback<TwitchGames>() {
-//            @Override
-//            public void onResponse(Call<TwitchGames> call, Response<TwitchGames> response) {
-//                List<Game> topGames=response.body().getGameList();
-//                view.showTopGames(topGames);
-//            }
-//
-//            @Override
-//            public void onFailure(Call<TwitchGames> call, Throwable t) {
-//                t.printStackTrace();
-//            }
-//        });
 
         twitchAPI.getTopGamesObservable(TwitchAPI.CLIENT_ID)
                 .flatMap(twitchGames -> Observable.fromIterable(twitchGames.getGameList()))
@@ -110,7 +97,7 @@ public class LoginPresenter implements LoginContract.Presenter {
                 .replay()
                 .autoConnect(2)
                 .doOnError(throwable ->
-                        view.showError("Connection error getting streams"));
+                        view.showErrorGettingStreams());
 
         streams.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -120,7 +107,7 @@ public class LoginPresenter implements LoginContract.Presenter {
 
         streams.flatMap(stream -> twitchAPI.getGame(((Stream) stream).getGameId(), TwitchAPI.CLIENT_ID))
                 .doOnError(throwable ->
-                        view.showError("Connection error getting game"))
+                        view.showErrorGettingGames())
                 .flatMap(twitchGames -> Observable.fromIterable(((TwitchGames) twitchGames).getGameList()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

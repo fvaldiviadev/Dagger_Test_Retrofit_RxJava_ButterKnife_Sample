@@ -4,4 +4,10 @@
     <string name="last_name">Last name</string>
     <string name="save_user">Save user</string>
     <string name="conectionError">Error de conexión</string>
+    <string name="error_user_not_available">Error, user not available</string>
+    <string name="error_input">Error, input error</string>
+    <string name="user_saved">User saved!</string>
+    <string name="stream">Stream:</string>
+    <string name="game">Game:</string>
+    <string name="error_connection_error_getting_streams">Connection error getting streams</string>
 </resources>

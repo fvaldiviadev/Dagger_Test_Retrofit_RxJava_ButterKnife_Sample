@@ -1,7 +1,6 @@
 package com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http;
 
 
-import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.Game;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.TwitchGames;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.TwitchStreams;
 

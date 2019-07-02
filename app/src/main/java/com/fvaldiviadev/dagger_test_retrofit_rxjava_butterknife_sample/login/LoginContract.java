@@ -27,7 +27,8 @@ public interface LoginContract {
         void showStreamTitle(String streamTitle);
         void showGameName(String gameName);
         void showStream(StreamMostViewed streamMostViewed);
-        void showError(String error);
+        void showErrorGettingStreams();
+        void showErrorGettingGames();
     }
 
     interface Presenter{

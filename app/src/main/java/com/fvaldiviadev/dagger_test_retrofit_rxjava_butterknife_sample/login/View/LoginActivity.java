@@ -1,7 +1,21 @@
 package com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.View;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import butterknife.Action;
+import butterknife.BindColor;
+import butterknife.BindDrawable;
+import butterknife.BindString;
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.ViewCollections;
+
+import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -22,9 +36,7 @@ import javax.inject.Inject;
 
 public class LoginActivity extends AppCompatActivity implements LoginContract.View {
 
-    EditText editTextFirstName, editTextLastName;
-    Button buttonLogin, buttonGetTopGames, buttonMostViewedStreams;
-    TextView textViewGetTopGames;
+    //Dagger
 
     @Inject
     Context context;
@@ -35,6 +47,54 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     @Inject
     TwitchAPI twitchAPI;
 
+
+    //Butterknife
+
+    @BindView(R.id.et_user)
+    EditText editTextFirstName;
+
+    @BindView(R.id.et_last_name)
+    EditText editTextLastName;
+
+    @BindViews({R.id.et_user, R.id.et_last_name, R.id.b_login})
+    List<View> loginViews;
+
+    @BindView(R.id.b_login)
+    Button buttonLogin;
+
+    @BindView(R.id.b_get_top_games)
+    Button buttonGetTopGames;
+
+    @BindView(R.id.b_get_most_viewed_streams)
+    Button buttonMostViewedStreams;
+
+    @BindView(R.id.tv_results)
+    TextView textViewResults;
+
+    @BindString((R.string.first_name))
+    String firstName;
+
+    @BindDrawable(R.drawable.ic_launcher_background)
+    Drawable imageBackground;
+
+    @BindColor((R.color.colorAccent))
+    ColorStateList colorAccent;
+
+    @OnClick (R.id.b_login)
+    void loginClicked(Button b){
+        b.setText("Sent!");
+        presenter.loginButtonClicked();
+    }
+
+
+    private static final Action<View> DISABLED = (view, index) -> {
+        view.setEnabled(false);
+    };
+
+    private static final Action<View> ENABLED = (view, index) -> {
+        view.setEnabled(true);
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,29 +102,19 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
         ((App) getApplication()).getComponent().inject(this);
 
-        editTextFirstName = findViewById(R.id.et_user);
-        editTextLastName = findViewById(R.id.et_last_name);
-        buttonLogin = findViewById(R.id.b_login);
-        buttonGetTopGames = findViewById(R.id.b_get_top_games);
-        buttonMostViewedStreams = findViewById(R.id.b_get_most_viewed_streams);
-        textViewGetTopGames = findViewById(R.id.tv_get_top_games);
+        ButterKnife.bind(this);
 
-        //Without Lambda
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.loginButtonClicked();
-            }
-        });
+        ViewCollections.run(loginViews, DISABLED);
+        ViewCollections.run(loginViews, ENABLED);
 
         //With Lambda
         buttonGetTopGames.setOnClickListener(v -> {
-            textViewGetTopGames.setText("");
+            textViewResults.setText("");
             presenter.getTopGames(twitchAPI);
         });
 
         buttonMostViewedStreams.setOnClickListener(v -> {
-            textViewGetTopGames.setText("");
+            textViewResults.setText("");
             presenter.getStreams(twitchAPI);
 
         });
@@ -90,17 +140,17 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
     @Override
     public void showUserNotAvailable() {
-        Toast.makeText(context, "Error, user not available", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, getString(R.string.error_user_not_available), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showInputError() {
-        Toast.makeText(context, "Error, input error", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, getString(R.string.error_input), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showUserSaved() {
-        Toast.makeText(context, "User saved!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, getString(R.string.user_saved), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -120,27 +170,32 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         ) {
             topGamesString = topGamesString + "\n" + game.getName();
         }
-        textViewGetTopGames.setText(topGamesString);
+        textViewResults.setText(topGamesString);
     }
 
     @Override
     public void showStreamTitle(String streamTitle) {
-        textViewGetTopGames.setText(textViewGetTopGames.getText() + "\nStream: " + streamTitle);
+        textViewResults.setText(textViewResults.getText() + "\n" + getString(R.string.stream) + " " + streamTitle);
     }
 
     @Override
     public void showGameName(String gameName) {
-        textViewGetTopGames.setText(textViewGetTopGames.getText() + "\nGame:" + gameName);
+        textViewResults.setText(textViewResults.getText() + "\n" + getString(R.string.game) + " " + gameName);
     }
 
     @Override
     public void showStream(StreamMostViewed streamMostViewed) {
-        textViewGetTopGames.setText(textViewGetTopGames.getText() + "\n\n" + streamMostViewed.getStreamName() + " - " + streamMostViewed.getGameName());
+        textViewResults.setText(textViewResults.getText() + "\n\n" + streamMostViewed.getStreamName() + " - " + streamMostViewed.getGameName());
     }
 
     @Override
-    public void showError(String error) {
-        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+    public void showErrorGettingStreams() {
+        Toast.makeText(this, getString(R.string.error_connection_error_getting_streams), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showErrorGettingGames() {
+        Toast.makeText(this, getString(R.string.error_connection_error_getting_streams), Toast.LENGTH_SHORT).show();
     }
 
 

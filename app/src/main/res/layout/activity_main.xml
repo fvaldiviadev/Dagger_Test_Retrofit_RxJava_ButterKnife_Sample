@@ -38,7 +38,7 @@
         android:text="Show the most watched Twitch Streams and their  game"/>
 
     <TextView
-        android:id="@+id/tv_get_top_games"
+        android:id="@+id/tv_results"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
