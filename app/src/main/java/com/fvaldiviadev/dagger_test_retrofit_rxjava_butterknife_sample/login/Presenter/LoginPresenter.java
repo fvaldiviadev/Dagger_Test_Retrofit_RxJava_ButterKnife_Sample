@@ -1,6 +1,7 @@
 package com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.login.Presenter;
 
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.R;
+import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.di.TwitchModule;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.TwitchAPI;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.Game;
 import com.fvaldiviadev.dagger_test_retrofit_rxjava_butterknife_sample.http.api.Stream;
@@ -22,6 +23,8 @@ public class LoginPresenter implements LoginContract.Presenter {
     @Nullable
     private LoginContract.View view;
     private LoginContract.Model model;
+
+    private Disposable subscription;
 
     public LoginPresenter(LoginContract.Model model) {
         this.model = model;
@@ -62,7 +65,7 @@ public class LoginPresenter implements LoginContract.Presenter {
     @Override
     public void getTopGames(TwitchAPI twitchAPI) {
 
-        twitchAPI.getTopGamesObservable(TwitchAPI.CLIENT_ID)
+        twitchAPI.getTopGamesObservable()
                 .flatMap(twitchGames -> Observable.fromIterable(twitchGames.getGameList()))
                 .flatMap((Function<Game, Observable<String>>)
                         game -> Observable.just(game.getName()))
@@ -91,7 +94,7 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     @Override
     public void getStreams(TwitchAPI twitchAPI) {
-        Observable streams = twitchAPI.getStreamsObservable(TwitchAPI.CLIENT_ID)
+        Observable streams = twitchAPI.getStreamsObservable()
                 .flatMap(twitchStreams -> Observable.fromIterable(twitchStreams.getStreamList()))
                 .filter(Stream -> Stream.getViewerCount() > 10000)
                 .replay()
@@ -105,7 +108,7 @@ public class LoginPresenter implements LoginContract.Presenter {
                     view.showStreamTitle(((Stream) stream).getTitle());
                 });
 
-        streams.flatMap(stream -> twitchAPI.getGame(((Stream) stream).getGameId(), TwitchAPI.CLIENT_ID))
+        streams.flatMap(stream -> twitchAPI.getGame(((Stream) stream).getGameId()))
                 .doOnError(throwable ->
                         view.showErrorGettingGames())
                 .flatMap(twitchGames -> Observable.fromIterable(((TwitchGames) twitchGames).getGameList()))
@@ -115,4 +118,8 @@ public class LoginPresenter implements LoginContract.Presenter {
 
 
     }
+
+//    public void getStreamsWithZip(TwitchAPI twitchAPI){
+//        Observable streams= Observable.zip(twitchAPI.getStreamsObservable(TwitchAPI.CLIENT_ID),twitchAPI.getGame())
+//    }
 }

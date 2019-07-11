@@ -12,18 +12,16 @@ import retrofit2.http.Query;
 
 public interface TwitchAPI {
 
-    String CLIENT_ID="2uqcxik63ezyr12qn7qcfw8dm08src";
-
     @GET("games/top")
     Call<TwitchGames> getTopGames(@Header("Client-Id") String clientId);
 
     @GET("games/top")
-    Observable<TwitchGames> getTopGamesObservable(@Header("Client-Id") String clientId);
+    Observable<TwitchGames> getTopGamesObservable();
 
     @GET("games")
-    Observable<TwitchGames> getGame(@Query("id") String id, @Header("Client-Id") String clientId);
+    Observable<TwitchGames> getGame(@Query("id") String id);
 
     @GET("streams")
-    Observable<TwitchStreams> getStreamsObservable(@Header("Client-Id") String clientId);
+    Observable<TwitchStreams> getStreamsObservable();
 
 }
