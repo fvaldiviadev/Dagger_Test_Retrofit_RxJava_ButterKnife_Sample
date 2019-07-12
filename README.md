@@ -3,4 +3,6 @@ Android app example using MVP Architecture, Dagger2, JUnit and Mockito test, RxJ
 
 You can find a tag for each technology, and compare the evolution of the code between versions.
 
-![Screenshot](screenshot2.png)
+I use [TwichAPI](https://dev.twitch.tv/) to get data.
+
+<img src="screenshot2.png" data-canonical-src="screenshot2.png" width="500" />
